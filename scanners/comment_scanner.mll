@@ -2,14 +2,14 @@
 exception SyntaxError of string
 }
 
-let left = '/' '*'
-let right = '*' '/'
-let any = ['^'left right]*
-let comment = left any right
+let left = "/*"
+let right = "*/"
+let all = _
+let comment = left (all # ['*' '/'])*? right
 
 
 rule lex_float = parse
-	comment {Lexing.lexeme lexbuf}
+	|comment {Lexing.lexeme lexbuf}
 	| _ { raise (SyntaxError ("bad comment")) }
 	| eof { exit 0 }
 
