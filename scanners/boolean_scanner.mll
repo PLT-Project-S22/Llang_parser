@@ -2,16 +2,14 @@
 exception SyntaxError of string
 }
 
+let true = "true"
+let false = "false"
 
 rule token = parse
-	"/*" {comment lexbuf}
+	true {Lexing.lexeme lexbuf}
+	| false {Lexing.lexeme lexbuf}
+	| _ { raise (SyntaxError("Not a Boolean token")) }
 	| eof { exit 0 }
-
-and comment = parse
-	"*/" {token lexbuf}
-	| _ {comment lexbuf}
-	| eof { raise (SyntaxError("Bad Comment"))}
-
 
 {
 	let buf = Lexing.from_channel stdin in 
