@@ -1,42 +1,56 @@
-%{ open Ast }%
+%{ Open Ast %}
 
-(* Arithmetic operators  *)
+/* Arithmetic operators  */
 %token PLUS MINUS TIMES DIVIDE MODULO EXPON FLOOR INCREMENT DECREMENT
-(* Assignment operators  *)
+/* Assignment operators  */
 %token ASSIGN PLUSASSIGN MINUSASSIGN TIMESASSIGN DIVIDEASSIGN MODULOASSIGN FLOORASSIGN EXPONASSIGN 
-(* Logical    operators  *)
+/* Logical    operators  */
 %token LAND LOR LNOT
-(* Comparison operators  *)
+/* Comparison operators  */
 %token EQ NEQ GT LT GEQ LEQ
-(* Keywords logic        *)
+/* Keywords logic        */
 %token AND OR NOT
-(* Keywords non-access   *)
+/* Keywords non-access   */
 %token CONST FINAL
-(* Keywords identity     *)
+/* Keywords identity     */
 %token IS ISNOT
-(* Keywords membership   *)
+/* Keywords membership   */
 %token IN NOTIN
-(* Keywords flow control *)
+/* Keywords flow control */
 %token WHEN WHILE IF ELSE BREAK CONTINUE DO FOR THEN SWITCH CASE DEFAULT
-(* Keywords Object       *)
+/* Keywords Object       */
 %token CLASS CONSTRUCTOR NEW SUPER EXTENDS IMPLEMENTS DOT INTERFACE THROWS RAISES THIS
-(* Keywords types        *)
+/* Keywords types        */
 %token BOOL FLOAT CHAR STRING INT NULL
-(* Keywords boolean lit  *)
+/* Keywords boolean lit  */
 %token TRUE FALSE
-(* Keywords imports      *)
+/* Keywords imports      */
 %token IMPORT AS
-(* Keywords functions    *)
+/* Keywords functions    */
 %token RETURN VOID
-(* Keywords exceptions   *)
+/* Keywords exceptions   */
 %token TRY CATCH FINALLY THROW RAISE
-(* Delimiter characters  *)
+/* Delimiter characters  */
 %token SEMICOLON COLON LCOMMENT RCOMMENT LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE COMMA SINGLEQUOTE DOUBLEQUOTE BACKTICK
-(* Scoping DELIMITERS   *)
+/* Scoping DELIMITERS    */
 %token NEWLINE INDENT DEDENT 
-(* Token                 *)
+/* Token                 */
 %token <int> INTLIT
-%token <float>
+%token <float> FLOATLIT
 %token <bool> BOOLLIT 
 %token <string> ID
+%token <string> STRINGLIT
 %token EOF
+
+
+%start token
+%type <Ast.token> token
+
+%%
+
+token:
+  | INDENT {}
+  | NEWLINE {}
+  | DEDENT {}
+  | COLON {}
+  | EOF {}

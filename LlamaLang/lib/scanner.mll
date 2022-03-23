@@ -1,5 +1,8 @@
 { 
   open Parser 
+
+
+  let create_hashtbl = 
   (* stack containing levels of indentation \t is treated as 4 whitespaces like python *)
   let indentStack = Stack.create()
   (* initial indentation level *)
@@ -22,6 +25,7 @@
     else if (!whiteSpaceCounter < Stack.top indentStack) then begin popIndentations() ; ignore(resetCounter()) end else ignore(resetCounter());
   
   let enqueueDedents (dedents: int) =
+    for i = 0 to !dedents do Queue.push DEDENT indentDedentQueue done
     let i = ref 0 in while !i < dedents do Queue.push DEDENT indentDedentQueue; ignore(incr i); done
   
   let dedents = ref 0
@@ -55,7 +59,7 @@ let uppercase = ['A'-'Z']
 let letter = lowercase | uppercase
 
 let id = (_ letter) (letter | digit | _ )+
-let newline = ':' ' '* ['\n' '\r' "\r\n" ]
+let newline = ['\n' '\r' "\r\n" ]$
 let startingWhiteSpace = ['\t' ' ']*
 
 rule token = parse
@@ -97,7 +101,7 @@ rule token = parse
   | "in"                    { IN            }
   | "not in"                { NOTIN         }
   | "when"                  { WHEN          }
-  | "while"                 { WHEN          }
+  | "while"                 { WHILE         }
   | "if"                    { IF            }
   | "else"                  { ELSE          }
   | "break"                 { BREAK         }
