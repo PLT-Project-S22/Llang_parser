@@ -1,0 +1,56 @@
+
+
+
+
+
+
+
+/* TEST */
+void helloWorld():
+	print('Hello World')
+
+int gcd(int a, int b):
+	if b == 0:
+		return a
+	else:
+		return gcd(b, a % b)
+
+int binarySearch(int[ ] arr, int left, int right, int x):
+	while left <= right:
+		
+		int mid = left + (right - left) // 2
+		
+		if arr[mid] ==  x:
+			return mid
+		else if arr[mid] < x:
+			left = mid + 1
+		else:
+			right = mid - 1
+	return -1
+
+class Node:
+	int val
+	Node left
+	Node right
+	
+ 	constructor(int val):
+		this.val = val
+		this.left = None
+		this.right = None
+
+class BinarySearchTree:
+	Node root
+	constructor(Node root):
+		this.root = root
+
+	Node insert(Node root, int val):	
+     		if root is None:
+          		return Node(val)
+     		else:
+          		if root.val == val:
+               		return root
+          		else if root.val < key:
+               		root.right = insert(root.right, key)
+          		else:
+               		root.left = insert(root.left, val)
+    return root

@@ -1,4 +1,4 @@
-%{ Open Ast %}
+%{ open Ast %}
 
 /* Arithmetic operators  */
 %token PLUS MINUS TIMES DIVIDE MODULO EXPON FLOOR INCREMENT DECREMENT
@@ -40,17 +40,125 @@
 %token <bool> BOOLLIT 
 %token <string> ID
 %token <string> STRINGLIT
+%token <char> CHARLIT
 %token EOF
 
+%right ASSIGN PLUSASSIGN MINUSASSIGN TIMESASSIGN DIVIDEASSIGN MODULOASSIGN FLOORASSIGN EXPONASSIGN 
+%left OR
+%left AND
+%nonassoc NOT
+%left LOR
+%left LAND
+%nonassoc LNOT
+%left EQ NEQ 
+%left GT LT GEQ LEQ
+%left PLUS MINUS 
+%left TIMES DIVIDE MODULO FLOOR
+%left EXPON
+%nonassoc INCREMENT DECREMENT
 
-%start token
-%type <Ast.token> token
+%start holder
+%type <Ast.holder> holder
 
 %%
 
-token:
-  | INDENT {}
-  | NEWLINE {}
-  | DEDENT {}
-  | COLON {}
-  | EOF {}
+holder:
+    PLUS {Var }
+  | MINUS {Var }
+  | TIMES {Var }
+  | DIVIDE {Var }
+  | MODULO {Var }
+  | EXPON {Var }
+  | FLOOR {Var }
+  | INCREMENT {Var }
+  | DECREMENT {Var }
+  | ASSIGN {Var }
+  | PLUSASSIGN {Var }
+  | MINUSASSIGN {Var }
+  | TIMESASSIGN {Var }
+  | DIVIDEASSIGN {Var }
+  | MODULOASSIGN {Var }
+  | FLOORASSIGN {Var }
+  | EXPONASSIGN {Var }
+  | LAND {Var }
+  | LOR {Var }
+  | LNOT {Var }
+  | EQ {Var }
+  | NEQ {Var }
+  | GT {Var }
+  | LT {Var }
+  | GEQ {Var }
+  | LEQ {Var }
+  | AND {Var }
+  | OR {Var }
+  | NOT {Var }
+  | CONST {Var }
+  | FINAL {Var }
+  | IS {Var }
+  | ISNOT {Var }
+  | IN {Var }
+  | NOTIN {Var }
+  | WHEN {Var }
+  | WHILE {Var }
+  | IF {Var }
+  | ELSE {Var }
+  | BREAK {Var }
+  | CONTINUE {Var }
+  | DO {Var }
+  | FOR {Var }
+  | THEN {Var }
+  | SWITCH {Var }
+  | CASE {Var }
+  | DEFAULT {Var }
+  | CLASS {Var }
+  | CONSTRUCTOR {Var }
+  | NEW {Var }
+  | SUPER {Var }
+  | EXTENDS {Var }
+  | IMPLEMENTS {Var }
+  | DOT {Var }
+  | INTERFACE {Var }
+  | THROWS {Var }
+  | RAISES {Var }
+  | THIS {Var }
+  | BOOL {Var }
+  | FLOAT {Var }
+  | CHAR {Var }
+  | STRING {Var }
+  | INT {Var }
+  | NULL {Var }
+  | TRUE {Var }
+  | FALSE {Var }
+  | IMPORT {Var }
+  | AS {Var }
+  | RETURN {Var }
+  | VOID {Var }
+  | TRY {Var }
+  | CATCH {Var }
+  | FINALLY {Var }
+  | THROW {Var }
+  | RAISE {Var }
+  | SEMICOLON {Var }
+  | COLON {Var }
+  | LCOMMENT {Var }
+  | RCOMMENT {Var }
+  | LPAREN {Var }
+  | RPAREN {Var }
+  | LBRACKET {Var }
+  | RBRACKET {Var }
+  | LBRACE {Var }
+  | RBRACE {Var }
+  | COMMA {Var }
+  | SINGLEQUOTE {Var }
+  | DOUBLEQUOTE {Var }
+  | BACKTICK {Var }
+  | NEWLINE {Var }
+  | INDENT {Var }
+  | DEDENT {Var }
+  | INTLIT {Var }
+  | FLOATLIT {Var }
+  | BOOLLIT  {Var }
+  | ID {Var }
+  | STRINGLIT {Var }
+  | CHARLIT {Var }
+  | EOF {Var }
