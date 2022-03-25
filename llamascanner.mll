@@ -16,20 +16,32 @@ rule token = parse
 | ')'      { RPAREN }
 | '{'      { LBRACE }
 | '}'      { RBRACE }
+| '['      { LBRACk }
+| ']'      { RBRACk }
+| ':'      { COLON }
 | ';'      { SEMI }
-(* COMMA *)
 | ','      { COMMA }
 | '+'      { PLUS }
 | '-'      { MINUS }
+| '*'      { MULTI }
+| '/'      { DIVIDE }
+| '%'      { MOD }
+| "//"     { FLOOR }
+| "++"     { INC }
+| "--"     { DEC }
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }
 | '<'      { LT }
+| '>'      { GT }
+| "<="     { LTEQ }
+| ">="     { GTEQ }
 | "&&"     { AND }
 | "||"     { OR }
 | "if"     { IF }
 | "else"   { ELSE }
 | "while"  { WHILE }
+| '!'      { NOT }
 (* RETURN *)
 | "return" { RETURN }
 | "int"    { INT }
