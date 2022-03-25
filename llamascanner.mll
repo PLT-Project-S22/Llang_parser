@@ -8,6 +8,10 @@ let integer = ('-' | '+')?digit+
 let float = digit*['.']digit* 
 let string = '"' letter* '"'
 let char = ''' '.' '''
+let pluseq = '+''='
+let minuseq = '-''='
+let divideeq = '/''='
+let expeq = '^''='
 
 rule token = parse
   [' ' '\t' '\r' '\n'] { token lexbuf } (* Whitespace *)
@@ -21,6 +25,13 @@ rule token = parse
 | ','      { COMMA }
 | '+'      { PLUS }
 | '-'      { MINUS }
+| '/'      { DIVIDE }
+| '^'      { EXP }
+| '%'      { MOD }
+| pluseq   { PLUSEQ } 
+| minuseq  { MINUSEQ } 
+| divideeq { DIVIDEEQ}
+| expeq    { EXPEQ }
 | '='      { ASSIGN }
 | "=="     { EQ }
 | "!="     { NEQ }

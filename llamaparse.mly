@@ -3,8 +3,9 @@ open Ast
 %}
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE PLUS MINUS ASSIGN
-%token RBRACK LBRACK MULTI DIVIDE MOD FLOOR
+%token RBRACK LBRACK MULTI DIVIDE MOD FLOOR EXP
 %token INC DEC LTEQ GTEQ NOT
+%token PLUSEQ MINUSEQ DIVIDEEQ EXPEQ
 %token EQ NEQ LT GT AND OR
 %token IF ELSE WHILE INT BOOL FLOAT CHAR STRING
 %token RETURN COMMA
@@ -25,6 +26,7 @@ open Ast
 %left NOT
 %left EQ NEQ
 %left LT GT LTEQ GTEQ
+%right EXP
 %left MULTI DIVIDE MOD FLOOR
 %left PLUS MINUS
 
@@ -96,13 +98,18 @@ expr:
   | CHARLIT                       { CharLiteral $1        }
   | STRLIT                        { StringLiteral $1      }
   | ID               { Id($1)                 }
-  | expr PLUS   expr { Binop($1, Add,   $3)   }
-  | expr MINUS  expr { Binop($1, Sub,   $3)   }
-  | expr EQ     expr { Binop($1, Equal, $3)   }
-  | expr NEQ    expr { Binop($1, Neq, $3)     }
-  | expr LT     expr { Binop($1, Less,  $3)   }
-  | expr AND    expr { Binop($1, And,   $3)   }
-  | expr OR     expr { Binop($1, Or,    $3)   }
+  | expr PLUS   expr  { Binop($1, Add,   $3)   }
+  | expr MINUS  expr  { Binop($1, Sub,   $3)   }
+  | expr EQ     expr  { Binop($1, Equal, $3)   }
+  | expr NEQ    expr  { Binop($1, Neq, $3)     }
+  | expr LT     expr  { Binop($1, Less,  $3)   }
+  | expr AND    expr  { Binop($1, And,   $3)   }
+  | expr OR     expr  { Binop($1, Or,    $3)   }
+  | expr EXP expr     { Binop ($1, Exp, $3)}
+  | expr PLUSEQ expr  { Assignop ($1, AddEq, $3)}
+  | expr MINUSEQ expr { Assignop ($1, MinusEq, $3)}
+  | expr DIVIDEEQ expr{ Assignop ($1, DivideEq, $3)}
+  | expr EXPEQ expr   { Assignop ($1, ExpEq, $3)}
   | ID ASSIGN expr   { Assign($1, $3)         }
   | LPAREN expr RPAREN { $2                   }
   /* call */

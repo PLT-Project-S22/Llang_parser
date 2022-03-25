@@ -1,6 +1,6 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
-type op = Add | Sub | Equal | Neq | Less | And | Or
+type op = Add | Sub | Equal | Neq | Less | And | Or| AddEq | MinusEq | DivideEq | ExpEq | Exp
 
 type typ = Int | Bool | Float | Char | String 
 
@@ -12,6 +12,7 @@ type expr =
   | StringLiteral of string 
   | Id of string
   | Binop of expr * op * expr
+  | Assignop of expr * op * expr
   | Assign of string * expr
   (* function call *)
   | Call of string * expr list
@@ -47,6 +48,11 @@ let string_of_op = function
   | Less -> "<"
   | And -> "&&"
   | Or -> "||"
+  | Exp -> "^"
+  | AddEq -> "+="
+  | MinusEq -> "-="
+  | DivideEq -> "/="
+  | ExpEq -> "^="
 
 let rec string_of_expr = function
     Literal(l) -> string_of_int l
@@ -57,6 +63,8 @@ let rec string_of_expr = function
   | StringLiteral(s) -> s
   | Id(s) -> s
   | Binop(e1, o, e2) ->
+    string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
+  | Assignop(e1, o, e2) ->
     string_of_expr e1 ^ " " ^ string_of_op o ^ " " ^ string_of_expr e2
   | Assign(v, e) -> v ^ " = " ^ string_of_expr e
   | Call(f, el) ->
