@@ -1,15 +1,20 @@
 (* Abstract Syntax Tree and functions for printing it *)
 
-type op = Add | Sub | Equal | Neq | Less | And | Or
+type op =  
+  | Add  | Sub   | Mul  | Div  | Flr   | Exp
+  | Incr | Decr  | Mod
+  | Eq   | Neq   | Lt   | Gt   | Geq   | Leq
+  | And  | Or    | Not  | Is   | IsNot 
+  | In   | NotIN | Asn  | Pasn 
 
 type typ = Int | Bool | Float | Char | String 
 
 type expr =
-    Literal of int
+  | IntLit of int
+  | FloatLit of float
   | BoolLit of bool
-  | FloatLiteral of float
-  | CharLiteral of char
-  | StringLiteral of string 
+  | CharLit of char
+  | StringLit of string 
   | Id of string
   | Binop of expr * op * expr
   | Assign of string * expr

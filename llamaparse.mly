@@ -1,118 +1,133 @@
-%{
-open Ast
-%}
+%{ open Ast %}
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE PLUS MINUS ASSIGN
-%token RBRACK LBRACK MULTI DIVIDE MOD FLOOR
-%token INC DEC LTEQ GTEQ NOT
-%token EQ NEQ LT GT AND OR
-%token IF ELSE WHILE INT BOOL FLOAT CHAR STRING
-%token RETURN COMMA
-%token <int> LITERAL
-%token <bool> BLIT
-%token <float> FLIT
-%token <char> CHARLIT
-%token <string> STRLIT
+/* Arithmetic operators  */
+%token PLUS MINUS TIMES DIVIDE MODULO EXPON FLOOR INCREMENT DECREMENT
+/* Assignment operators  */
+%token ASSIGN PLUSASSIGN MINUSASSIGN TIMESASSIGN DIVIDEASSIGN MODULOASSIGN FLOORASSIGN EXPONASSIGN 
+/* Logical    operators  */
+%token LAND LOR LNOT
+/* Comparison operators  */
+%token EQ NEQ GT LT GEQ LEQ
+/* Keywords logic        */
+%token AND OR NOT
+/* Keywords non-access   */
+%token CONST FINAL
+/* Keywords identity     */
+%token IS ISNOT
+/* Keywords membership   */
+%token IN NOTIN
+/* Keywords flow control */
+%token WHEN WHILE IF ELSE BREAK CONTINUE DO FOR THEN SWITCH CASE DEFAULT
+/* Keywords Object       */
+%token CLASS CONSTRUCTOR NEW SUPER EXTENDS IMPLEMENTS DOT INTERFACE THROWS RAISES THIS
+/* Keywords types        */
+%token BOOL FLOAT CHAR STRING INT NULL
+/* Keywords boolean lit  */
+%token TRUE FALSE
+/* Keywords imports      */
+%token IMPORT AS
+/* Keywords functions    */
+%token RETURN VOID
+/* Keywords exceptions   */
+%token TRY CATCH FINALLY THROW RAISE
+/* Delimiter characters  */
+%token SEMICOLON COLON LCOMMENT RCOMMENT LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE COMMA SINGLEQUOTE DOUBLEQUOTE BACKTICK
+/* Scoping DELIMITERS    */
+%token NEWLINE INDENT DEDENT 
+/* Token                 */
+%token <int> INTLIT
+%token <float> FLOATLIT
+%token <bool> BOOLLIT 
 %token <string> ID
+%token <string> STRINGLIT
+%token <char> CHARLIT
 %token EOF
 
-%start program
-%type <Ast.program> program
-
-%right ASSIGN
+%right ASSIGN PLUSASSIGN MINUSASSIGN TIMESASSIGN DIVIDEASSIGN MODULOASSIGN FLOORASSIGN EXPONASSIGN 
 %left OR
 %left AND
-%left NOT
-%left EQ NEQ
-%left LT GT LTEQ GTEQ
-%left MULTI DIVIDE MOD FLOOR
-%left PLUS MINUS
+%nonassoc NOT
+%left LOR
+%left LAND
+%nonassoc LNOT
+%left EQ NEQ 
+%left GT LT GEQ LEQ
+%left PLUS MINUS 
+%left TIMES DIVIDE MODULO FLOOR
+%left EXPON
+%nonassoc INCREMENT DECREMENT
 
 %%
 
 program:
-  decls EOF { $1}
+  stmts EOF {$1}
 
-decls:
-   /* nothing */ { ([], [])               }
- | vdecl SEMI decls { (($1 :: fst $3), snd $3) }
- | fdecl decls { (fst $2, ($1 :: snd $2)) }
+statements:
+   statement*
 
-vdecl_list:
-  /*nothing*/ { [] }
-  | vdecl SEMI vdecl_list  {  $1 :: $3 }
+statement:
+     simple_stmts {$1}
+   | compound_stmt {[$1]}
 
-/* int x */
-vdecl:
-  typ ID { ($1, $2) }
+simple_stmts:
+     simple_stmt NEWLINE {}
+   | simple_stmt SEMICOLON simple_stmt+ NEWLINE
 
-typ:
-    INT   { Int   }
-  | BOOL  { Bool  }
-  | FLOAT   { Float }
-  | CHAR    { Char  }
-  | STRING  { String }
+simple_stmt:
+    dec_stmt {}
+  | assign_stmt {}
+  | return_stmt {}
+  | import_stmt {}
+  | raise_stmt  {}
 
-/* fdecl */
-fdecl:
-  vdecl LPAREN formals_opt RPAREN LBRACE vdecl_list stmt_list RBRACE
-  {
-    {
-      rtyp=fst $1;
-      fname=snd $1;
-      formals=$3;
-      locals=$6;
-      body=$7
-    }
-  }
+compound_stmt:
+     func_def {}
+   | class_def {}
+   | while_stmt {}
+   | for_stmt {}
+   | try_stmt {}
+   | when_stmt {}
 
-/* formals_opt */
-formals_opt:
-  /*nothing*/ { [] }
-  | formals_list { $1 }
+dec_stmt:
+    
 
-formals_list:
-  vdecl { [$1] }
-  | vdecl COMMA formals_list { $1::$3 }
 
-stmt_list:
-  /* nothing */ { [] }
-  | stmt stmt_list  { $1::$2 }
+assign_stmt:
+     ID ASSIGN expr { Assign()}
+   | ID PLUSASSIGN expr {}
+   | ID MINUSASSIGN expr {}
+   | ID TIMESASSIGN expr {}
+   | ID DIVIDEASSIGN expr {}
+   | ID MODULOASSIGN expr {}
+   | ID FLOORASSIGN expr {}
+   | ID EXPONASSIGN expr {}
 
-stmt:
-    expr SEMI                               { Expr $1      }
-  | LBRACE stmt_list RBRACE                 { Block $2 }
-  /* if (condition) { block1} else {block2} */
-  /* if (condition) stmt else stmt */
-  | IF LPAREN expr RPAREN stmt ELSE stmt    { If($3, $5, $7) }
-  | WHILE LPAREN expr RPAREN stmt           { While ($3, $5)  }
-  /* return */
-  | RETURN expr SEMI                        { Return $2      }
+if_stmt:
+   IF conditional COLON block
+   else_if_stmt*
+   else_clause?
+
+else_if_stmt:
+  ELSE IF conditional COLON block
+
+
+block: 
+    NEWLINE INDENT stmts DEDENT
 
 expr:
-    LITERAL          { Literal($1)            }
-  | BLIT             { BoolLit($1)            }
-  | FLIT                          { FloatLiteral $1       }
-  | CHARLIT                       { CharLiteral $1        }
-  | STRLIT                        { StringLiteral $1      }
-  | ID               { Id($1)                 }
-  | expr PLUS   expr { Binop($1, Add,   $3)   }
-  | expr MINUS  expr { Binop($1, Sub,   $3)   }
-  | expr EQ     expr { Binop($1, Equal, $3)   }
-  | expr NEQ    expr { Binop($1, Neq, $3)     }
-  | expr LT     expr { Binop($1, Less,  $3)   }
-  | expr AND    expr { Binop($1, And,   $3)   }
-  | expr OR     expr { Binop($1, Or,    $3)   }
-  | ID ASSIGN expr   { Assign($1, $3)         }
+    INTLIT             { Literal($1)            }
+  | BOOLLIT            { BoolLit($1)            }
+  | FLOATLIT           { FloatLiteral($1)       }
+  | CHARLIT            { CharLiteral($1)        }
+  | STRINGLIT          { StringLit($1)          }
+  | ID                 { Id($1)                 }
+  | expr PLUS   expr   { Binop($1, Add,   $3)   }
+  | expr MINUS  expr   { Binop($1, Sub,   $3)   }
+  | expr EQ     expr   { Binop($1, Equal, $3)   }
+  | expr NEQ    expr   { Binop($1, Neq, $3)     }
+  | expr LT     expr   { Binop($1, Less,  $3)   }
+  | expr AND    expr   { Binop($1, And,   $3)   }
+  | expr OR     expr   { Binop($1, Or,    $3)   }
+  | ID ASSIGN expr     { Assign($1, $3)         }
   | LPAREN expr RPAREN { $2                   }
-  /* call */
   | ID LPAREN args_opt RPAREN { Call ($1, $3)  }
-
-/* args_opt*/
-args_opt:
-  /*nothing*/ { [] }
-  | args { $1 }
-
-args:
-  expr  { [$1] }
-  | expr COMMA args { $1::$3 }
