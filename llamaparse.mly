@@ -59,75 +59,140 @@
 
 %%
 
-program:
-  stmts EOF {$1}
+file:
+  [statements] EOF {$1}
 
 statements:
-   statement*
+  statment* {}
 
 statement:
-     simple_stmts {$1}
-   | compound_stmt {[$1]}
+    compound_statement {}
+  | simple_statments {}
 
-simple_stmts:
-     simple_stmt NEWLINE {}
-   | simple_stmt SEMICOLON simple_stmt+ NEWLINE
+simple_statments:
+    simple_statment NEWLINE {}
+  | simple_statment SEMICOLON NEWLINE {}
+  | simple_statement SEMICOLON simple_statement+ NEWLINE {}
+  | simple_statement SEMICOLON simple_statement SEMICOLON NEWLINE {}
 
-simple_stmt:
-    dec_stmt {}
-  | assign_stmt {}
-  | return_stmt {}
-  | import_stmt {}
-  | raise_stmt  {}
+simple_statement:
+    assignment {}
+  | return_statement {}
+  | then_statement {}
+  | import_statement {}
+  | expression statement {}
 
-compound_stmt:
-     func_def {}
-   | class_def {}
-   | while_stmt {}
-   | for_stmt {}
-   | try_stmt {}
-   | when_stmt {}
+compound_statement:
+    function {}
+  | class {}
+  | if_statement {}
+  | for_statement {}
+  | when_statement {}
+  | while_statement {}
+  | try_statement {}
 
-dec_stmt:
-    
+assignment:
+    ID ASSIGN expr {}
+  | ID PLUSASSIGN expr {}
+  | ID MINUSASSIGN expr {}
+  | ID TIMESASSIGN expr {}
+  | ID DIVIDEASSIGN expr {}
+  | ID MODULOASSIGN expr {}
+  | ID FLOORASSIGN expr {}
+  | ID EXPONASSIGN expr {}
 
+import_statement:
+    IMPORT ID {}
+  | IMPORT ID AS ID {}
 
-assign_stmt:
-     ID ASSIGN expr { Assign()}
-   | ID PLUSASSIGN expr {}
-   | ID MINUSASSIGN expr {}
-   | ID TIMESASSIGN expr {}
-   | ID DIVIDEASSIGN expr {}
-   | ID MODULOASSIGN expr {}
-   | ID FLOORASSIGN expr {}
-   | ID EXPONASSIGN expr {}
+if_statement: 
+    IF expr COLON block else_if_statment{}
+  | IF expr COLON block else_clause {}
 
-if_stmt:
-   IF conditional COLON block
-   else_if_stmt*
-   else_clause?
+else_if_statment:
+    ELSE IF expr COLON block else_if_statment {}
+  | ELSE IF expr COLON block else_clause {}
 
-else_if_stmt:
-  ELSE IF conditional COLON block
+else_clause:
+    ELSE COLON block {}
 
+for_statement:
+    FOR type_decl expr IN type_decl expr COLON block {}
+  | FOR args COLON block {}
+ 
+when_statement:
+    WHEN expr IS COLON NEWLINE INDENT case_block+ default_block DEDENT {}
 
-block: 
-    NEWLINE INDENT stmts DEDENT
+while_statement:
+    WHILE expr COLON block {}
+
+try_statement:
+    TRY COLON block finally_block {}
+  | TRY COLON block catch_block+ finally_block  {}
+
+then_statement:
+  THEN simple_statement
+
+case_block:
+    ID COLON NEWLINE INDENT then_statement DEDENT {}
+
+default_block:
+  DEFAULT COLON NEWLINE INDENT then_statement DEDENT {}
+
+catch_block:
+    CATCH expr COLON block {}
+
+finally_block:
+    FINALLY COLON block {}
+
+function:
+  id_decl ID
+
+formals_opt:
+  /*nothing*/ { [] }
+  | formals_list { $1 }
+
+formals_list:
+    id_decl { [$1] }
+  | id_decl COMMA formals_list { $1::$3 }
+
+id_decl:
+  typ ID { ($1, $2) }
+
+typ:
+    INT    { Int    }
+  | FLOAT  { Float  }
+  | BOOL   { Bool   }
+  | CHAR   { Char   }
+  | STRING { String } 
+  | VOID   { Void   }
+
+block:
+    NEWLINE INDENT statements DEDENT {}
+  | simple_statments {}
 
 expr:
-    INTLIT             { Literal($1)            }
-  | BOOLLIT            { BoolLit($1)            }
-  | FLOATLIT           { FloatLiteral($1)       }
-  | CHARLIT            { CharLiteral($1)        }
-  | STRINGLIT          { StringLit($1)          }
-  | ID                 { Id($1)                 }
-  | expr PLUS   expr   { Binop($1, Add,   $3)   }
-  | expr MINUS  expr   { Binop($1, Sub,   $3)   }
-  | expr EQ     expr   { Binop($1, Equal, $3)   }
-  | expr NEQ    expr   { Binop($1, Neq, $3)     }
-  | expr LT     expr   { Binop($1, Less,  $3)   }
-  | expr AND    expr   { Binop($1, And,   $3)   }
-  | expr OR     expr   { Binop($1, Or,    $3)   }
-  | ID ASSIGN expr     { Assign($1, $3)         }
+    LITERAL          { Literal($1)            }
+  | BLIT             { BoolLit($1)            }
+  | ID               { Id($1)                 }
+  | expr PLUS   expr { Binop($1, Add,   $3)   }
+  | expr MINUS  expr { Binop($1, Sub,   $3)   }
+  | expr EQ     expr { Binop($1, Equal, $3)   }
+  | expr NEQ    expr { Binop($1, Neq, $3)     }
+  | expr LT     expr { Binop($1, Less,  $3)   }
+  | expr AND    expr { Binop($1, And,   $3)   }
+  | expr OR     expr { Binop($1, Or,    $3)   }
+  | ID ASSIGN expr   { Assign($1, $3)         }
   | LPAREN expr RPAREN { $2                   }
+  /* call */
   | ID LPAREN args_opt RPAREN { Call ($1, $3)  }
+
+
+/* args_opt*/
+args_opt:
+  /*nothing*/ { [] }
+  | args { $1 }
+
+args:
+  expr  { [$1] }
+  | expr COMMA args { $1::$3 }
